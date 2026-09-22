@@ -1,33 +1,45 @@
 import plugin from "../plugin.json";
 
-class AcodePlugin {
+class RunButton {
 	baseUrl = "";
+	$runBtn!: HTMLSpanElement;
 
-	async init(
-		_page: Acode.WCPage,
-		_cacheFile: Acode.FileSystem,
-		_cacheFileUrl: string,
-	): Promise<void> {
-		// plugin initialisation
-	}
+	initRunButton() {
+        this.$runBtn = document.createElement("span");
+        this.$runBtn.className = "icon play_arrow";
+        this.$runBtn.setAttribute("action", "run");
+        this.$runBtn.title = "Click to run";
 
-	async destroy(): Promise<void> {
-		// plugin clean up
+        const listener = async () => {
+            if (this.$runBtn.isConnected) {
+                this.$runBtn.remove();
+            }
+
+        }
+    
+        editorManager.on('switch-file', listener);
+        editorManager.on('rename-file', listener);
+
+        return listener()
+    }
+
+	initAPI() {
+		acode.define("runButton", {
+
+		});
 	}
 }
 
 if (window.acode) {
-	const acodePlugin = new AcodePlugin();
+	const instance = new RunButton();
 
-	acode.setPluginInit(
-		plugin.id,
-		async (baseUrl, $page, { cacheFileUrl, cacheFile }) => {
-			acodePlugin.baseUrl = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
-			await acodePlugin.init($page, cacheFile, cacheFileUrl);
-		},
-	);
+	const init: Acode.PluginInit = async (baseUrl, $page, { cacheFileUrl, cacheFile }) => {
+		instance.baseUrl = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
+		
+	}
 
-	acode.setPluginUnmount(plugin.id, () => {
-		void acodePlugin.destroy();
-	});
+	const unmount = () => {}
+
+	acode.setPluginInit(plugin.id, init);
+	acode.setPluginUnmount(plugin.id, unmount);
 }
