@@ -1,4 +1,4 @@
-import { logError } from "./log";
+import { logError, logInfo } from "./log";
 import type { RunButtonAPI } from "./runButtonAPI";
 import type { RunAction } from "./types";
 
@@ -62,6 +62,7 @@ export class RunButtonUI {
 		this.#cleanups.push(this.#api.on("active-change", this.#onActiveChange));
 
 		void this.#api.refresh();
+		logInfo("run button attached");
 	}
 
 	detach(): void {
@@ -78,6 +79,8 @@ export class RunButtonUI {
 		this.#$menu?.hide();
 		this.#$menu?.destroy();
 		this.#$menu = null;
+
+		logInfo("run button detached");
 	}
 
 	#onContentChanged = (): void => {
@@ -96,13 +99,18 @@ export class RunButtonUI {
 		if (!this.#attached) return;
 
 		const active = await this.#api.refresh();
-		if (!this.#attached || !active.length) return;
+		if (!this.#attached || !active.length) {
+			logInfo(`run button clicked, but ${active.length} runners are active`);
+			return;
+		}
 
 		if (active.length === 1 && active[0].category === "file") {
+			logInfo(`single file runner active, running "${active[0].name}" directly`);
 			await this.#run(active[0]);
 			return;
 		}
 
+		logInfo(`opening runner menu (${active.length} active runners)`);
 		this.#openMenu(active);
 	};
 
@@ -155,8 +163,10 @@ export class RunButtonUI {
 	}
 
 	async #run(action: RunAction): Promise<void> {
+		logInfo(`running "${action.name}" (category=${action.category})`);
 		try {
 			await action.run(this.#api.getContext());
+			logInfo(`runner "${action.name}" finished`);
 		} catch (error) {
 			logError(`runner "${action.name}" threw`, error);
 		}

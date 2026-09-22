@@ -3,7 +3,7 @@ const fs = require("fs");
 const jszip = require("jszip");
 
 const iconFile = path.join(__dirname, "icon.png");
-const licenseFile = path.join(__dirname, "LICENSE");
+const licenseFile = findLicenseFile();
 const pluginJSON = path.join(__dirname, "plugin.json");
 const distFolder = path.join(__dirname, "dist");
 const json = JSON.parse(fs.readFileSync(pluginJSON, "utf8"));
@@ -19,8 +19,8 @@ const zip = new jszip();
 zip.file("icon.png", fs.readFileSync(iconFile));
 zip.file("plugin.json", fs.readFileSync(pluginJSON));
 
-if (fs.existsSync(licenseFile)) {
-  zip.file("LICENSE", fs.readFileSync(licenseFile));
+if (licenseFile) {
+  zip.file(path.basename(licenseFile), fs.readFileSync(licenseFile));
 }
 
 if (readmeDotMd) {
@@ -36,12 +36,30 @@ if (changelogDotMd) {
 
 loadFile("", distFolder);
 
+const zipName = `clickrun-plugin-v${json.version}.zip`;
+
 zip
   .generateNodeStream({ type: "nodebuffer", streamFiles: true })
-  .pipe(fs.createWriteStream(path.join(__dirname, "plugin.zip")))
+  .pipe(fs.createWriteStream(path.join(__dirname, zipName)))
   .on("finish", () => {
-    console.log("Plugin plugin.zip written.");
+    console.log(
+      `Plugin ${zipName} written (${Object.keys(zip.files).length} files).`,
+    );
   });
+
+function findLicenseFile() {
+  for (const name of [
+    "LICENSE",
+    "LICENSE.txt",
+    "LICENSE.md",
+    "UNLICENSE",
+    "UNLICENSE.txt",
+  ]) {
+    const file = path.join(__dirname, name);
+    if (fs.existsSync(file)) return file;
+  }
+  return null;
+}
 
 function loadFile(root, folder) {
   const distFiles = fs.readdirSync(folder);

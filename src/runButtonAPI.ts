@@ -1,4 +1,4 @@
-import { logError } from "./log";
+import { logError, logInfo } from "./log";
 import type {
 	RunAction,
 	RunActionOptions,
@@ -85,6 +85,9 @@ export class RunButtonAPI {
 		if (icon) action.icon = icon;
 
 		this.#registry.actions.set(id, action);
+		logInfo(
+			`runner registered: "${action.name}" (category=${category}, id=${id}), total=${this.#registry.actions.size}`,
+		);
 		this.#emit("register");
 		void this.refresh();
 
@@ -108,6 +111,9 @@ export class RunButtonAPI {
 		const id = typeof action === "string" ? action : action?.id;
 		if (!id) return false;
 		if (!this.#registry.actions.delete(id)) return false;
+		logInfo(
+			`runner unregistered: ${id}, total=${this.#registry.actions.size}`,
+		);
 		this.#emit("unregister");
 		void this.refresh();
 		return true;
@@ -185,6 +191,11 @@ export class RunButtonAPI {
 		this.#active = active;
 		if (key !== this.#activeKey) {
 			this.#activeKey = key;
+			logInfo(
+				`active runners (${active.length}): ${
+					active.map((action) => action.name).join(", ") || "none"
+				}`,
+			);
 			this.#emit("active-change");
 		}
 
