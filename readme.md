@@ -2,6 +2,8 @@
 
 A single button for every runner plugin.
 
+<img width="1080" height="810" alt="1000170708" src="https://github.com/user-attachments/assets/4472bc26-4fca-4bf0-ab95-125d8b33272d" />
+
 Acode has no unified run button API, 
 so each plugin with runner logic adds its own button to the editor header. 
 When several runner plugins are installed 
