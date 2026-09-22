@@ -39,6 +39,7 @@ export class RunButtonAPI {
 	#active: RunAction[] = [];
 	#activeKey = "";
 	#refreshToken = 0;
+	#refreshScheduled = false;
 	#listeners = new Map<RunButtonEvent, Set<RunButtonEventListener>>();
 
 	/**
@@ -89,7 +90,7 @@ export class RunButtonAPI {
 			`runner registered: "${action.name}" (category=${category}, id=${id}), total=${this.#registry.actions.size}`,
 		);
 		this.#emit("register");
-		void this.refresh();
+		this.#scheduleRefresh();
 
 		return () => {
 			if (this.#registry.actions.get(id) === action) this.unregister(id);
@@ -115,7 +116,7 @@ export class RunButtonAPI {
 			`runner unregistered: ${id}, total=${this.#registry.actions.size}`,
 		);
 		this.#emit("unregister");
-		void this.refresh();
+		this.#scheduleRefresh();
 		return true;
 	}
 
@@ -162,9 +163,21 @@ export class RunButtonAPI {
 		return { file, folder, uri: file?.uri, filename: file?.filename };
 	}
 
+	/**
+	 * Coalesces the refreshes triggered by registrations so that a plugin
+	 * registering many runners only causes a single `runnable()` pass.
+	 */
+	#scheduleRefresh(): void {
+		if (this.#refreshScheduled) return;
+		this.#refreshScheduled = true;
+		setTimeout(() => {
+			this.#refreshScheduled = false;
+			void this.refresh();
+		}, 0);
+	}
+
 	/** Re-evaluates every runner's `runnable()` and notifies the UI. */
-	async refresh(): Promise<RunAction[]> {
-		const token = ++this.#refreshToken;
+	async refresh(): Promise<RunAction[]> {		const token = ++this.#refreshToken;
 		const context = this.getContext();
 		const actions = this.getActions();
 
