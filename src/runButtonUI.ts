@@ -133,12 +133,11 @@ export class RunButtonUI {
 
 	#openMenu(active: RunAction[]): void {
 		const contextMenu = acode.require("contextMenu");
-		const rect = this.#$btn.getBoundingClientRect();
 
 		this.#$menu?.destroy();
 		this.#$menu = contextMenu({
-			top: `${Math.round(rect.bottom)}px`,
-			right: `${Math.round(innerWidth - rect.right)}px`,
+			top: "6px",
+			toggler: this.#$btn,
 			transformOrigin: "top right",
 			items: [],
 			innerHTML: () => this.#renderMenu(active),
