@@ -1,12 +1,16 @@
 # Click Run
 
-**Click Run** gives Acode a single run button that every runner plugin shares.
+A single button for every runner plugin.
 
-Acode has no unified run button API, so each plugin with runner logic adds its
-own button to the editor header. When several runner plugins are installed the
-header fills up with look-alike play buttons that are hard to tell apart.
-Click Run fixes that: plugins register their run actions once and Click Run
-renders one button and one menu for all of them.
+Acode has no unified run button API, 
+so each plugin with runner logic adds its own button to the editor header. 
+When several runner plugins are installed 
+the header fills up with look-alike play buttons that are hard to tell apart.
+
+Click Run fixes that:  
+
+Plugins register their run actions once 
+and Click Run renders one button and one menu for all of them.
 
 ## Behavior
 
@@ -20,6 +24,21 @@ renders one button and one menu for all of them.
   saved or loaded, when folders are added, removed or updated, when file
   content changes (debounced), and when runners are registered or
   unregistered.
+
+## Build
+
+```sh
+npm install
+npm run dev        # watch, serve on :3000, rebuild plugin.zip
+npm run typecheck
+npm run build      # typecheck, bundle, write plugin.zip
+```
+
+In Acode, install from **Plugins → + → Remote** using
+`http://<your-ip>:3000/plugin.zip`.
+
+
+# Click-run APIs
 
 ## Registering a runner
 
@@ -123,15 +142,3 @@ withRunButton((runButton) => {
   Registering a duplicate id replaces the previous runner.
 - Keep `runnable()` cheap: it runs for every registered runner on every
   file/folder/content change.
-
-## Build
-
-```sh
-npm install
-npm run dev        # watch, serve on :3000, rebuild plugin.zip
-npm run typecheck
-npm run build      # typecheck, bundle, write plugin.zip
-```
-
-In Acode, install from **Plugins → + → Remote** using
-`http://<your-ip>:3000/plugin.zip`.
