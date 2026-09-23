@@ -42,6 +42,8 @@ In Acode, install from **Plugins → + → Remote** using
 
 # Click-run APIs
 
+Below are some guidelines to help you use the Click-run API.
+
 ## Registering a runner
 
 Click Run defines the `runButton` module. Plugin load order is not guaranteed,
