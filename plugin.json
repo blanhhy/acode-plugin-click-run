@@ -10,7 +10,7 @@
   "icon": "icon.png",
   "files": [],
   "minVersionCode": 967,
-  "license": "Unlicense",
+  "license": "MIT",
   "keywords": [
     "run",
     "runner",
